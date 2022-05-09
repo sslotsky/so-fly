@@ -1,5 +1,6 @@
 port module Main exposing (..)
 import Json.Encode as E
+import Time
 
 
 -- Press buttons to increment and decrement a counter.
@@ -12,6 +13,7 @@ import Browser
 import Html exposing (Html, node)
 -- import Html.Events exposing (onClick)
 import Html exposing (canvas)
+import Browser.Events exposing (onAnimationFrame)
 import Html.Attributes exposing (height)
 import Html.Attributes exposing (width)
 
@@ -24,7 +26,7 @@ main =
   Browser.element { init = init, update = update, subscriptions = subscriptions, view = view }
 
 subscriptions _ =
-  Sub.none
+  Time.every 1 Tick
 
 port sendMessage : E.Value -> Cmd msg
 
@@ -45,7 +47,8 @@ init _ =
     hero = Model 200 600 { position = (5, 50) }
   in
     ( hero
-    , sendMessage (encodeGame hero)
+    , Cmd.none
+    --, sendMessage (encodeGame hero)
     )
 
 
@@ -53,13 +56,14 @@ init _ =
 
 
 type Msg
-  = Increment
-  | Decrement
+  = Tick Time.Posix
 
 
 -- update : Msg -> Model -> Model
-update _ model =
-  ( model, Cmd.none )
+update msg model =
+  case msg of
+    Tick _ ->
+      (model, sendMessage (encodeGame model))
 
 
 -- VIEW

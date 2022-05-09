@@ -54,7 +54,6 @@
 	})
 
 	app.ports.sendMessage.subscribe(function(gameData) {
-		console.log(gameData)
 		const gameCanvas = document.getElementsByTagName('game-canvas')[0]
 		gameCanvas.draw(gameData)
 	})
