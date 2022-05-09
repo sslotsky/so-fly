@@ -1,0 +1,62 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Elm St</title>
+	<script type="module">
+		class GameCanvas extends HTMLElement {
+			constructor() {
+				super()
+
+				const shadow = this.attachShadow({ mode: 'open' })
+				const canvas = document.createElement('canvas')
+				shadow.appendChild(canvas)
+				canvas.height = this.height()
+				canvas.width = this.width()
+				this.canvas = canvas
+			}
+
+			height() {
+				return this.getAttribute('height')
+			}
+
+			width() {
+				return this.getAttribute('width')
+			}
+
+			draw(gameData) {
+				const context = this.canvas.getContext('2d')
+				context.clearRect(0, 0, this.width, this.height)
+				context.beginPath()
+				context.rect(0, 0, this.width(), this.height())
+				context.fillStyle = "black"
+				context.fill()
+
+				context.fillText('🐸', gameData.hero.x, gameData.hero.y)
+			}
+		}
+
+		customElements.define('game-canvas', GameCanvas)
+	</script>
+  <script type="text/javascript" src="elm.js"></script>
+</head>
+
+<template id="game-template">
+	<canvas></canvas>
+</template>
+
+<body>
+	<div id="app"></div>
+</body>
+
+<script type="text/javascript">
+	const app = Elm.Main.init({
+		node: document.getElementById("app")
+	})
+
+	app.ports.sendMessage.subscribe(function(gameData) {
+		console.log(gameData)
+		const gameCanvas = document.getElementsByTagName('game-canvas')[0]
+		gameCanvas.draw(gameData)
+	})
+</script>
+</html>
