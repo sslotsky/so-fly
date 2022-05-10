@@ -2704,7 +2704,7 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		p: func(record.p),
+		q: func(record.q),
 		N: record.N,
 		K: record.K
 	}
@@ -2974,7 +2974,7 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.p;
+		var message = !tag ? value : tag < 3 ? value.a : value.q;
 		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.N;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
@@ -5193,11 +5193,11 @@ var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Main$init = function (_v0) {
 	var hero = A3(
 		$author$project$Main$Model,
-		200,
+		400,
 		600,
 		{
 			C: _Utils_Tuple2(5, 50),
-			s: _Utils_Tuple2(0, 0)
+			m: _Utils_Tuple2(0, 0)
 		});
 	return _Utils_Tuple2(hero, $elm$core$Platform$Cmd$none);
 };
@@ -5635,7 +5635,7 @@ var $author$project$Main$Down = 3;
 var $author$project$Main$Left = 0;
 var $author$project$Main$Right = 1;
 var $author$project$Main$Up = 2;
-var $elm$json$Json$Encode$int = _Json_wrap;
+var $elm$json$Json$Encode$float = _Json_wrap;
 var $elm$json$Json$Encode$object = function (pairs) {
 	return _Json_wrap(
 		A3(
@@ -5659,12 +5659,13 @@ var $author$project$Main$encodeHero = function (_v0) {
 			[
 				_Utils_Tuple2(
 				'x',
-				$elm$json$Json$Encode$int(x)),
+				$elm$json$Json$Encode$float(x)),
 				_Utils_Tuple2(
 				'y',
-				$elm$json$Json$Encode$int(y))
+				$elm$json$Json$Encode$float(y))
 			]));
 };
+var $elm$json$Json$Encode$int = _Json_wrap;
 var $author$project$Main$encodeGame = function (model) {
 	return $elm$json$Json$Encode$object(
 		_List_fromArray(
@@ -5688,10 +5689,33 @@ var $author$project$Main$move = F3(
 				C: _Utils_Tuple2(x, y)
 			});
 	});
+var $elm$core$Basics$negate = function (n) {
+	return -n;
+};
+var $elm$core$Basics$abs = function (n) {
+	return (n < 0) ? (-n) : n;
+};
+var $author$project$Main$decelerate = F2(
+	function (speed, resistance) {
+		return ($elm$core$Basics$abs(speed) <= 0.01) ? 0 : (speed * (1 - (resistance / 60)));
+	});
+var $author$project$Main$withFriction = function (hero) {
+	var _v0 = hero.m;
+	var vx = _v0.a;
+	var vy = _v0.b;
+	var friction = 0.1;
+	return _Utils_update(
+		hero,
+		{
+			m: _Utils_Tuple2(
+				A2($author$project$Main$decelerate, vx, friction),
+				A2($author$project$Main$decelerate, vy, friction))
+		});
+};
 var $author$project$Main$nextState = function (model) {
 	var _v0 = model.f;
 	var position = _v0.C;
-	var velocity = _v0.s;
+	var velocity = _v0.m;
 	var _v1 = _Utils_Tuple2(position, velocity);
 	var _v2 = _v1.a;
 	var x = _v2.a;
@@ -5702,12 +5726,13 @@ var $author$project$Main$nextState = function (model) {
 	return _Utils_update(
 		model,
 		{
-			f: A3($author$project$Main$move, model.f, x + vx, y + vy)
+			f: $author$project$Main$withFriction(
+				A3($author$project$Main$move, model.f, x + vx, y + vy))
 		});
 };
 var $author$project$Main$push = F2(
 	function (hero, direction) {
-		var _v0 = hero.s;
+		var _v0 = hero.m;
 		var x = _v0.a;
 		var y = _v0.b;
 		switch (direction) {
@@ -5715,25 +5740,25 @@ var $author$project$Main$push = F2(
 				return _Utils_update(
 					hero,
 					{
-						s: _Utils_Tuple2(x - 1, y)
+						m: _Utils_Tuple2(x - 0.2, y)
 					});
 			case 1:
 				return _Utils_update(
 					hero,
 					{
-						s: _Utils_Tuple2(x + 1, y)
+						m: _Utils_Tuple2(x + 0.2, y)
 					});
 			case 2:
 				return _Utils_update(
 					hero,
 					{
-						s: _Utils_Tuple2(x, y - 1)
+						m: _Utils_Tuple2(x, y - 0.2)
 					});
 			default:
 				return _Utils_update(
 					hero,
 					{
-						s: _Utils_Tuple2(x, y + 1)
+						m: _Utils_Tuple2(x, y + 0.2)
 					});
 		}
 	});

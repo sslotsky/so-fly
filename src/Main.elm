@@ -28,8 +28,8 @@ port bodyKeyPress : (Int -> msg) -> Sub msg
 
 -- MODEL
 
-type alias Position = (Int, Int)
-type alias Velocity = (Int, Int)
+type alias Position = (Float, Float)
+type alias Velocity = (Float, Float)
 type alias Hero =
   { position: Position, velocity: Velocity }
 type alias Model =
@@ -41,7 +41,7 @@ type alias Model =
 init : () -> (Model, Cmd Msg)
 init _ =
   let
-    hero = Model 200 600 { position = (5, 50), velocity = (0, 0) }
+    hero = Model 400 600 { position = (5, 50), velocity = (0, 0) }
   in
     (hero, Cmd.none)
 
@@ -53,27 +53,36 @@ type Msg
   = Tick Time.Posix
   | BodyKeyPress Int
 
-move: Hero -> Int -> Int -> Hero
+move: Hero -> Float -> Float -> Hero
 move hero x y =
   { hero | position = (x, y)}
 
 type Direction = Left | Right | Up | Down
 
+decelerate : Float -> Float -> Float
+decelerate speed resistance =
+  if abs speed <= 0.01 then 0 else speed * (1 - resistance / 60)
+
+withFriction : Hero -> Hero
+withFriction hero =
+  let (vx, vy) = hero.velocity in
+  let friction = 0.1 in
+  { hero | velocity = (decelerate vx friction, decelerate vy friction) }
+
 push : Hero -> Direction -> Hero
 push hero direction =
   let (x, y) = hero.velocity in
     case direction of
-      Left -> { hero | velocity = (x - 1, y)}
-      Right -> { hero | velocity = (x + 1, y)}
-      Up -> { hero | velocity = (x, y - 1)}
-      Down -> { hero | velocity = (x, y + 1)}
+      Left -> { hero | velocity = (x - 0.2, y)}
+      Right -> { hero | velocity = (x + 0.2, y)}
+      Up -> { hero | velocity = (x, y - 0.2)}
+      Down -> { hero | velocity = (x, y + 0.2)}
 
 nextState model =
   let {position, velocity} = model.hero in
   let ((x, y), (vx, vy)) = (position, velocity) in
-  { model | hero = move model.hero (x + vx) (y + vy)}
+  { model | hero = withFriction(move model.hero (x + vx) (y + vy))}
 
--- update : Msg -> Model -> Model
 update : Msg -> Model -> (Model, Cmd msg)
 update msg model =
   case msg of
@@ -86,10 +95,6 @@ update msg model =
         38 -> let {hero} = model in ({ model | hero = push hero Up }, Cmd.none)
         39 -> let {hero} = model in ({ model | hero = push hero Right }, Cmd.none)
         40 -> let {hero} = model in ({ model | hero = push hero Down }, Cmd.none)
-        -- 37 -> (Model model.height model.width { position = (x - 1, y)}, Cmd.none)
-        -- 38 -> (Model model.height model.width { position = (x, y - 1)}, Cmd.none)
-        -- 39 -> (Model model.height model.width { position = (x + 1, y)}, Cmd.none)
-        -- 40 -> (Model model.height model.width { position = (x, y + 1)}, Cmd.none)
         _ -> (model, Cmd.none)
 
 -- VIEW
@@ -100,8 +105,8 @@ encodeHero {position} =
     (x, y) = position
   in
     E.object
-      [ ("x", E.int x)
-      , ("y", E.int y)
+      [ ("x", E.float x)
+      , ("y", E.float y)
       ]
 encodeGame : { a | height : Int, width : Int, hero : Hero } -> E.Value
 encodeGame model =
