@@ -784,11 +784,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.M.B === region.S.B)
+	if (region.N.D === region.S.D)
 	{
-		return 'on line ' + region.M.B;
+		return 'on line ' + region.N.D;
 	}
-	return 'on lines ' + region.M.B + ' through ' + region.S.B;
+	return 'on lines ' + region.N.D + ' through ' + region.S.D;
 }
 
 
@@ -2705,8 +2705,8 @@ var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
 		q: func(record.q),
-		N: record.N,
-		K: record.K
+		O: record.O,
+		L: record.L
 	}
 });
 
@@ -2975,10 +2975,10 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 
 		var value = result.a;
 		var message = !tag ? value : tag < 3 ? value.a : value.q;
-		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.N;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.O;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.K) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.L) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -3968,7 +3968,7 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 		impl.aE,
 		impl.aC,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.L && impl.L(sendToApp)
+			var divertHrefToApp = impl.M && impl.M(sendToApp)
 			var view = impl.aF;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
@@ -4043,7 +4043,7 @@ function _Browser_application(impl)
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		L: function(sendToApp)
+		M: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -4236,8 +4236,8 @@ function _Browser_getViewport()
 		ak: {
 			al: _Browser_window.pageXOffset,
 			am: _Browser_window.pageYOffset,
-			O: _Browser_doc.documentElement.clientWidth,
-			H: _Browser_doc.documentElement.clientHeight
+			I: _Browser_doc.documentElement.clientWidth,
+			C: _Browser_doc.documentElement.clientHeight
 		}
 	};
 }
@@ -4247,8 +4247,8 @@ function _Browser_getScene()
 	var body = _Browser_doc.body;
 	var elem = _Browser_doc.documentElement;
 	return {
-		O: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
-		H: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
+		I: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
+		C: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
 	};
 }
 
@@ -4272,14 +4272,14 @@ function _Browser_getViewportOf(id)
 	{
 		return {
 			ah: {
-				O: node.scrollWidth,
-				H: node.scrollHeight
+				I: node.scrollWidth,
+				C: node.scrollHeight
 			},
 			ak: {
 				al: node.scrollLeft,
 				am: node.scrollTop,
-				O: node.clientWidth,
-				H: node.clientHeight
+				I: node.clientWidth,
+				C: node.clientHeight
 			}
 		};
 	});
@@ -4313,14 +4313,14 @@ function _Browser_getElement(id)
 			ak: {
 				al: x,
 				am: y,
-				O: _Browser_doc.documentElement.clientWidth,
-				H: _Browser_doc.documentElement.clientHeight
+				I: _Browser_doc.documentElement.clientWidth,
+				C: _Browser_doc.documentElement.clientHeight
 			},
 			as: {
 				al: x + rect.left,
 				am: y + rect.top,
-				O: rect.width,
-				H: rect.height
+				I: rect.width,
+				C: rect.height
 			}
 		};
 	});
@@ -5186,7 +5186,7 @@ var $elm$core$Task$perform = F2(
 var $elm$browser$Browser$element = _Browser_element;
 var $author$project$Main$Model = F3(
 	function (height, width, hero) {
-		return {H: height, f: hero, O: width};
+		return {C: height, f: hero, I: width};
 	});
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
@@ -5196,7 +5196,7 @@ var $author$project$Main$init = function (_v0) {
 		400,
 		600,
 		{
-			C: _Utils_Tuple2(5, 50),
+			y: _Utils_Tuple2(5, 50),
 			m: _Utils_Tuple2(0, 0)
 		});
 	return _Utils_Tuple2(hero, $elm$core$Platform$Cmd$none);
@@ -5650,7 +5650,7 @@ var $elm$json$Json$Encode$object = function (pairs) {
 			pairs));
 };
 var $author$project$Main$encodeHero = function (_v0) {
-	var position = _v0.C;
+	var position = _v0.y;
 	var _v1 = position;
 	var x = _v1.a;
 	var y = _v1.b;
@@ -5672,21 +5672,33 @@ var $author$project$Main$encodeGame = function (model) {
 			[
 				_Utils_Tuple2(
 				'height',
-				$elm$json$Json$Encode$int(model.H)),
+				$elm$json$Json$Encode$int(model.C)),
 				_Utils_Tuple2(
 				'width',
-				$elm$json$Json$Encode$int(model.O)),
+				$elm$json$Json$Encode$int(model.I)),
 				_Utils_Tuple2(
 				'hero',
 				$author$project$Main$encodeHero(model.f))
 			]));
 };
+var $elm$core$Basics$clamp = F3(
+	function (low, high, number) {
+		return (_Utils_cmp(number, low) < 0) ? low : ((_Utils_cmp(number, high) > 0) ? high : number);
+	});
+var $author$project$Main$clamped = F3(
+	function (maxX, maxY, _v0) {
+		var x = _v0.a;
+		var y = _v0.b;
+		return _Utils_Tuple2(
+			A3($elm$core$Basics$clamp, 0, maxX, x),
+			A3($elm$core$Basics$clamp, 0, maxY, y));
+	});
 var $author$project$Main$move = F3(
 	function (hero, x, y) {
 		return _Utils_update(
 			hero,
 			{
-				C: _Utils_Tuple2(x, y)
+				y: _Utils_Tuple2(x, y)
 			});
 	});
 var $elm$core$Basics$negate = function (n) {
@@ -5714,7 +5726,7 @@ var $author$project$Main$withFriction = function (hero) {
 };
 var $author$project$Main$nextState = function (model) {
 	var _v0 = model.f;
-	var position = _v0.C;
+	var position = _v0.y;
 	var velocity = _v0.m;
 	var _v1 = _Utils_Tuple2(position, velocity);
 	var _v2 = _v1.a;
@@ -5723,42 +5735,58 @@ var $author$project$Main$nextState = function (model) {
 	var _v3 = _v1.b;
 	var vx = _v3.a;
 	var vy = _v3.b;
+	var _v4 = A3(
+		$author$project$Main$clamped,
+		model.I,
+		model.C,
+		_Utils_Tuple2(x + vx, y + vy));
+	var nextX = _v4.a;
+	var nextY = _v4.b;
 	return _Utils_update(
 		model,
 		{
 			f: $author$project$Main$withFriction(
-				A3($author$project$Main$move, model.f, x + vx, y + vy))
+				A3($author$project$Main$move, model.f, nextX, nextY))
 		});
 };
-var $author$project$Main$push = F2(
-	function (hero, direction) {
-		var _v0 = hero.m;
-		var x = _v0.a;
-		var y = _v0.b;
+var $author$project$Main$push = F3(
+	function (hero, direction, _v0) {
+		var height = _v0.C;
+		var width = _v0.I;
+		var _v1 = hero.m;
+		var x = _v1.a;
+		var y = _v1.b;
+		var _v2 = hero.y;
+		var px = _v2.a;
+		var py = _v2.b;
 		switch (direction) {
 			case 0:
+				var speed = (px > 0) ? (x - 0.2) : 0;
 				return _Utils_update(
 					hero,
 					{
-						m: _Utils_Tuple2(x - 0.2, y)
+						m: _Utils_Tuple2(speed, y)
 					});
 			case 1:
+				var speed = (_Utils_cmp(px, width) < 0) ? (x + 0.2) : 0;
 				return _Utils_update(
 					hero,
 					{
-						m: _Utils_Tuple2(x + 0.2, y)
+						m: _Utils_Tuple2(speed, y)
 					});
 			case 2:
+				var speed = (py > 0) ? (y - 0.2) : 0;
 				return _Utils_update(
 					hero,
 					{
-						m: _Utils_Tuple2(x, y - 0.2)
+						m: _Utils_Tuple2(x, speed)
 					});
 			default:
+				var speed = (_Utils_cmp(py, height) < 0) ? (y + 0.2) : 0;
 				return _Utils_update(
 					hero,
 					{
-						m: _Utils_Tuple2(x, y + 0.2)
+						m: _Utils_Tuple2(x, speed)
 					});
 		}
 	});
@@ -5781,7 +5809,7 @@ var $author$project$Main$update = F2(
 						_Utils_update(
 							model,
 							{
-								f: A2($author$project$Main$push, hero, 0)
+								f: A3($author$project$Main$push, hero, 0, model)
 							}),
 						$elm$core$Platform$Cmd$none);
 				case 38:
@@ -5791,7 +5819,7 @@ var $author$project$Main$update = F2(
 						_Utils_update(
 							model,
 							{
-								f: A2($author$project$Main$push, hero, 2)
+								f: A3($author$project$Main$push, hero, 2, model)
 							}),
 						$elm$core$Platform$Cmd$none);
 				case 39:
@@ -5801,7 +5829,7 @@ var $author$project$Main$update = F2(
 						_Utils_update(
 							model,
 							{
-								f: A2($author$project$Main$push, hero, 1)
+								f: A3($author$project$Main$push, hero, 1, model)
 							}),
 						$elm$core$Platform$Cmd$none);
 				case 40:
@@ -5811,7 +5839,7 @@ var $author$project$Main$update = F2(
 						_Utils_update(
 							model,
 							{
-								f: A2($author$project$Main$push, hero, 3)
+								f: A3($author$project$Main$push, hero, 3, model)
 							}),
 						$elm$core$Platform$Cmd$none);
 				default:
@@ -5842,8 +5870,8 @@ var $author$project$Main$view = function (model) {
 		'game-canvas',
 		_List_fromArray(
 			[
-				$elm$html$Html$Attributes$height(model.H),
-				$elm$html$Html$Attributes$width(model.O)
+				$elm$html$Html$Attributes$height(model.C),
+				$elm$html$Html$Attributes$width(model.I)
 			]),
 		_List_Nil);
 };

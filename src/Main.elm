@@ -69,19 +69,33 @@ withFriction hero =
   let friction = 0.1 in
   { hero | velocity = (decelerate vx friction, decelerate vy friction) }
 
-push : Hero -> Direction -> Hero
-push hero direction =
+push : Hero -> Direction -> Model -> Hero
+push hero direction {height, width} =
   let (x, y) = hero.velocity in
+  let (px, py) = hero.position in
     case direction of
-      Left -> { hero | velocity = (x - 0.2, y)}
-      Right -> { hero | velocity = (x + 0.2, y)}
-      Up -> { hero | velocity = (x, y - 0.2)}
-      Down -> { hero | velocity = (x, y + 0.2)}
+      Left -> 
+        let speed = if px > 0 then x - 0.2 else 0 in
+          { hero | velocity = (speed, y)}
+      Right ->
+        let speed = if px < toFloat width then x + 0.2 else 0 in
+          { hero | velocity = (speed, y)}
+      Up ->
+        let speed = if py > 0 then y - 0.2 else 0 in
+          { hero | velocity = (x, speed)}
+      Down ->
+        let speed = if py < toFloat height then y + 0.2 else 0 in
+        { hero | velocity = (x, speed)}
+
+clamped : Float -> Float -> Position -> Position 
+clamped maxX maxY (x, y) =
+  (clamp 0 maxX x, clamp 0 maxY y)
 
 nextState model =
   let {position, velocity} = model.hero in
   let ((x, y), (vx, vy)) = (position, velocity) in
-  { model | hero = withFriction(move model.hero (x + vx) (y + vy))}
+  let (nextX, nextY) = clamped (toFloat model.width) (toFloat model.height) (x + vx, y + vy) in
+  { model | hero = move model.hero nextX nextY |> withFriction }
 
 update : Msg -> Model -> (Model, Cmd msg)
 update msg model =
@@ -91,10 +105,10 @@ update msg model =
         (next, sendMessage (encodeGame next))
     BodyKeyPress keyCode ->
       case keyCode of
-        37 -> let {hero} = model in ({ model | hero = push hero Left }, Cmd.none)
-        38 -> let {hero} = model in ({ model | hero = push hero Up }, Cmd.none)
-        39 -> let {hero} = model in ({ model | hero = push hero Right }, Cmd.none)
-        40 -> let {hero} = model in ({ model | hero = push hero Down }, Cmd.none)
+        37 -> let {hero} = model in ({ model | hero = model |> push hero Left }, Cmd.none)
+        38 -> let {hero} = model in ({ model | hero = model |> push hero Up }, Cmd.none)
+        39 -> let {hero} = model in ({ model | hero = model |> push hero Right }, Cmd.none)
+        40 -> let {hero} = model in ({ model | hero = model |> push hero Down }, Cmd.none)
         _ -> (model, Cmd.none)
 
 -- VIEW
