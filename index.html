@@ -61,5 +61,9 @@
 	document.body.onkeydown = function(e) {
 		app.ports.bodyKeyPress.send(e.keyCode);
 	};
+
+	document.body.onkeyup = function(e) {
+		app.ports.bodyKeyUp.send(e.keyCode);
+	};
 </script>
 </html>
