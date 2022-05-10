@@ -29,8 +29,9 @@ port bodyKeyPress : (Int -> msg) -> Sub msg
 -- MODEL
 
 type alias Position = (Int, Int)
+type alias Velocity = (Int, Int)
 type alias Hero =
-  { position: Position }
+  { position: Position, velocity: Velocity }
 type alias Model =
   { height: Int
   , width: Int
@@ -40,7 +41,7 @@ type alias Model =
 init : () -> (Model, Cmd Msg)
 init _ =
   let
-    hero = Model 200 600 { position = (5, 50) }
+    hero = Model 200 600 { position = (5, 50), velocity = (0, 0) }
   in
     (hero, Cmd.none)
 
@@ -52,18 +53,43 @@ type Msg
   = Tick Time.Posix
   | BodyKeyPress Int
 
+move: Hero -> Int -> Int -> Hero
+move hero x y =
+  { hero | position = (x, y)}
+
+type Direction = Left | Right | Up | Down
+
+push : Hero -> Direction -> Hero
+push hero direction =
+  let (x, y) = hero.velocity in
+    case direction of
+      Left -> { hero | velocity = (x - 1, y)}
+      Right -> { hero | velocity = (x + 1, y)}
+      Up -> { hero | velocity = (x, y - 1)}
+      Down -> { hero | velocity = (x, y + 1)}
+
+nextState model =
+  let {position, velocity} = model.hero in
+  let ((x, y), (vx, vy)) = (position, velocity) in
+  { model | hero = move model.hero (x + vx) (y + vy)}
 
 -- update : Msg -> Model -> Model
 update : Msg -> Model -> (Model, Cmd msg)
 update msg model =
-  let
-    (x, y) = model.hero.position in
   case msg of
     Tick _ ->
-      (model, sendMessage (encodeGame model))
+      let next = nextState model in
+        (next, sendMessage (encodeGame next))
     BodyKeyPress keyCode ->
       case keyCode of
-        37 -> (Model model.height model.width { position = (x - 1, y)}, Cmd.none)
+        37 -> let {hero} = model in ({ model | hero = push hero Left }, Cmd.none)
+        38 -> let {hero} = model in ({ model | hero = push hero Up }, Cmd.none)
+        39 -> let {hero} = model in ({ model | hero = push hero Right }, Cmd.none)
+        40 -> let {hero} = model in ({ model | hero = push hero Down }, Cmd.none)
+        -- 37 -> (Model model.height model.width { position = (x - 1, y)}, Cmd.none)
+        -- 38 -> (Model model.height model.width { position = (x, y - 1)}, Cmd.none)
+        -- 39 -> (Model model.height model.width { position = (x + 1, y)}, Cmd.none)
+        -- 40 -> (Model model.height model.width { position = (x, y + 1)}, Cmd.none)
         _ -> (model, Cmd.none)
 
 -- VIEW
