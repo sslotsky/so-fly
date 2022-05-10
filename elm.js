@@ -784,11 +784,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.K.z === region.Q.z)
+	if (region.M.z === region.R.z)
 	{
-		return 'on line ' + region.K.z;
+		return 'on line ' + region.M.z;
 	}
-	return 'on lines ' + region.K.z + ' through ' + region.Q.z;
+	return 'on lines ' + region.M.z + ' through ' + region.R.z;
 }
 
 
@@ -2705,8 +2705,8 @@ var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
 		o: func(record.o),
-		L: record.L,
-		I: record.I
+		N: record.N,
+		K: record.K
 	}
 });
 
@@ -2975,10 +2975,10 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 
 		var value = result.a;
 		var message = !tag ? value : tag < 3 ? value.a : value.o;
-		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.L;
+		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.N;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
-			(tag == 2 ? value.b : tag == 3 && value.I) && event.preventDefault(),
+			(tag == 2 ? value.b : tag == 3 && value.K) && event.preventDefault(),
 			eventNode
 		);
 		var tagger;
@@ -3968,7 +3968,7 @@ var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, deb
 		impl.aD,
 		impl.aB,
 		function(sendToApp, initialModel) {
-			var divertHrefToApp = impl.J && impl.J(sendToApp)
+			var divertHrefToApp = impl.L && impl.L(sendToApp)
 			var view = impl.aE;
 			var title = _VirtualDom_doc.title;
 			var bodyNode = _VirtualDom_doc.body;
@@ -4043,7 +4043,7 @@ function _Browser_application(impl)
 	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
 
 	return _Browser_document({
-		J: function(sendToApp)
+		L: function(sendToApp)
 		{
 			key.a = sendToApp;
 			_Browser_window.addEventListener('popstate', key);
@@ -4236,8 +4236,8 @@ function _Browser_getViewport()
 		aj: {
 			ak: _Browser_window.pageXOffset,
 			al: _Browser_window.pageYOffset,
-			M: _Browser_doc.documentElement.clientWidth,
-			E: _Browser_doc.documentElement.clientHeight
+			G: _Browser_doc.documentElement.clientWidth,
+			F: _Browser_doc.documentElement.clientHeight
 		}
 	};
 }
@@ -4247,8 +4247,8 @@ function _Browser_getScene()
 	var body = _Browser_doc.body;
 	var elem = _Browser_doc.documentElement;
 	return {
-		M: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
-		E: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
+		G: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
+		F: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
 	};
 }
 
@@ -4272,14 +4272,14 @@ function _Browser_getViewportOf(id)
 	{
 		return {
 			ag: {
-				M: node.scrollWidth,
-				E: node.scrollHeight
+				G: node.scrollWidth,
+				F: node.scrollHeight
 			},
 			aj: {
 				ak: node.scrollLeft,
 				al: node.scrollTop,
-				M: node.clientWidth,
-				E: node.clientHeight
+				G: node.clientWidth,
+				F: node.clientHeight
 			}
 		};
 	});
@@ -4313,14 +4313,14 @@ function _Browser_getElement(id)
 			aj: {
 				ak: x,
 				al: y,
-				M: _Browser_doc.documentElement.clientWidth,
-				E: _Browser_doc.documentElement.clientHeight
+				G: _Browser_doc.documentElement.clientWidth,
+				F: _Browser_doc.documentElement.clientHeight
 			},
 			ar: {
 				ak: x + rect.left,
 				al: y + rect.top,
-				M: rect.width,
-				E: rect.height
+				G: rect.width,
+				F: rect.height
 			}
 		};
 	});
@@ -4905,7 +4905,7 @@ var $elm$url$Url$Http = 0;
 var $elm$url$Url$Https = 1;
 var $elm$url$Url$Url = F6(
 	function (protocol, host, port_, path, query, fragment) {
-		return {S: fragment, U: host, Y: path, _: port_, ac: protocol, ad: query};
+		return {T: fragment, U: host, Y: path, _: port_, ac: protocol, ad: query};
 	});
 var $elm$core$String$contains = _String_contains;
 var $elm$core$String$length = _String_length;
@@ -5186,7 +5186,7 @@ var $elm$core$Task$perform = F2(
 var $elm$browser$Browser$element = _Browser_element;
 var $author$project$Main$Model = F3(
 	function (height, width, hero) {
-		return {E: height, T: hero, M: width};
+		return {F: height, H: hero, G: width};
 	});
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
@@ -5196,11 +5196,19 @@ var $author$project$Main$init = function (_v0) {
 		200,
 		600,
 		{
-			H: _Utils_Tuple2(5, 50)
+			A: _Utils_Tuple2(5, 50)
 		});
 	return _Utils_Tuple2(hero, $elm$core$Platform$Cmd$none);
 };
-var $author$project$Main$Tick = $elm$core$Basics$identity;
+var $author$project$Main$BodyKeyPress = function (a) {
+	return {$: 1, a: a};
+};
+var $author$project$Main$Tick = function (a) {
+	return {$: 0, a: a};
+};
+var $elm$core$Platform$Sub$batch = _Platform_batch;
+var $elm$json$Json$Decode$int = _Json_decodeInt;
+var $author$project$Main$bodyKeyPress = _Platform_incomingPort('bodyKeyPress', $elm$json$Json$Decode$int);
 var $elm$time$Time$Every = F2(
 	function (a, b) {
 		return {$: 0, a: a, b: b};
@@ -5615,7 +5623,12 @@ var $elm$time$Time$every = F2(
 			A2($elm$time$Time$Every, interval, tagger));
 	});
 var $author$project$Main$subscriptions = function (_v0) {
-	return A2($elm$time$Time$every, 1, $elm$core$Basics$identity);
+	return $elm$core$Platform$Sub$batch(
+		_List_fromArray(
+			[
+				A2($elm$time$Time$every, 1, $author$project$Main$Tick),
+				$author$project$Main$bodyKeyPress($author$project$Main$BodyKeyPress)
+			]));
 };
 var $elm$json$Json$Encode$int = _Json_wrap;
 var $elm$json$Json$Encode$object = function (pairs) {
@@ -5632,7 +5645,7 @@ var $elm$json$Json$Encode$object = function (pairs) {
 			pairs));
 };
 var $author$project$Main$encodeHero = function (_v0) {
-	var position = _v0.H;
+	var position = _v0.A;
 	var _v1 = position;
 	var x = _v1.a;
 	var y = _v1.b;
@@ -5653,22 +5666,42 @@ var $author$project$Main$encodeGame = function (model) {
 			[
 				_Utils_Tuple2(
 				'height',
-				$elm$json$Json$Encode$int(model.E)),
+				$elm$json$Json$Encode$int(model.F)),
 				_Utils_Tuple2(
 				'width',
-				$elm$json$Json$Encode$int(model.M)),
+				$elm$json$Json$Encode$int(model.G)),
 				_Utils_Tuple2(
 				'hero',
-				$author$project$Main$encodeHero(model.T))
+				$author$project$Main$encodeHero(model.H))
 			]));
 };
 var $author$project$Main$sendMessage = _Platform_outgoingPort('sendMessage', $elm$core$Basics$identity);
 var $author$project$Main$update = F2(
 	function (msg, model) {
-		return _Utils_Tuple2(
-			model,
-			$author$project$Main$sendMessage(
-				$author$project$Main$encodeGame(model)));
+		var _v0 = model.H.A;
+		var x = _v0.a;
+		var y = _v0.b;
+		if (!msg.$) {
+			return _Utils_Tuple2(
+				model,
+				$author$project$Main$sendMessage(
+					$author$project$Main$encodeGame(model)));
+		} else {
+			var keyCode = msg.a;
+			if (keyCode === 37) {
+				return _Utils_Tuple2(
+					A3(
+						$author$project$Main$Model,
+						model.F,
+						model.G,
+						{
+							A: _Utils_Tuple2(x - 1, y)
+						}),
+					$elm$core$Platform$Cmd$none);
+			} else {
+				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+			}
+		}
 	});
 var $elm$html$Html$Attributes$height = function (n) {
 	return A2(
@@ -5693,8 +5726,8 @@ var $author$project$Main$view = function (model) {
 		'game-canvas',
 		_List_fromArray(
 			[
-				$elm$html$Html$Attributes$height(model.E),
-				$elm$html$Html$Attributes$width(model.M)
+				$elm$html$Html$Attributes$height(model.F),
+				$elm$html$Html$Attributes$width(model.G)
 			]),
 		_List_Nil);
 };

@@ -57,5 +57,9 @@
 		const gameCanvas = document.getElementsByTagName('game-canvas')[0]
 		gameCanvas.draw(gameData)
 	})
+
+	document.body.onkeydown = function(e) {
+		app.ports.bodyKeyPress.send(e.keyCode);
+	};
 </script>
 </html>
