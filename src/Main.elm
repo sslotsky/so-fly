@@ -2,6 +2,7 @@ port module Main exposing (..)
 import Json.Encode as E
 import Time
 import Browser
+import Random
 import Html exposing (Html, node)
 import Html.Attributes exposing (height)
 import Html.Attributes exposing (width)
@@ -40,6 +41,8 @@ type alias MoveController =
   , down: Bool
   }
 
+type alias Fly =
+  { position: Position, velocity: Velocity }
 type alias Hero =
   { position: Position, velocity: Velocity }
 
@@ -47,6 +50,7 @@ type alias Model =
   { height: Int
   , width: Int
   , hero: Hero
+  , flies: List(Fly)
   , controller: MoveController
   }
 
@@ -56,7 +60,7 @@ init _ =
   let controller = { right = False, up = False, down = False, left = False } in
 
   let hero = { position = position, velocity = velocity } in
-  let model = Model height width hero controller
+  let model = Model height width hero [] controller
   in
     (model, Cmd.none)
 
@@ -66,6 +70,7 @@ init _ =
 
 type Msg
   = Tick Time.Posix
+  | NewFly Position
   | BodyKeyPress Int
   | BodyKeyUp Int
 
@@ -144,12 +149,27 @@ moveToggle on direction model =
 startMoving = moveToggle(True)
 stopMoving = moveToggle(False)
 
-update : Msg -> Model -> (Model, Cmd msg)
+randomPoint : Model -> Random.Generator Position
+randomPoint model =
+  Random.pair (Random.float 0 (toFloat model.width)) (Random.float 0 (toFloat model.height))
+
+update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
     Tick _ ->
       let next = nextState model in
-        (next, sendMessage (encodeGame next))
+        ( next
+        , Cmd.batch
+          [ sendMessage (encodeGame next)
+          , Random.generate NewFly (randomPoint model)
+          ]
+        )
+    NewFly position ->
+      let
+        fly = { position = position, velocity = (0, 0) }
+        flies = fly :: model.flies
+      in
+        ({ model | flies = flies }, Cmd.none)
     BodyKeyPress keyCode ->
       case keyCode of
         37 -> (model |> startMoving Left, Cmd.none)
@@ -176,12 +196,24 @@ encodeHero {position} =
       [ ("x", E.float x)
       , ("y", E.float y)
       ]
-encodeGame : { a | height : Int, width : Int, hero : Hero } -> E.Value
+
+encodeFly : Fly -> E.Value
+encodeFly {position} =
+  let
+    (x, y) = position
+  in
+    E.object
+      [ ("x", E.float x)
+      , ("y", E.float y)
+      ]
+
+encodeGame : Model -> E.Value
 encodeGame model =
   E.object
     [ ("height", E.int model.height)
     , ("width", E.int model.width)
     , ("hero", encodeHero model.hero)
+    , ("flies", E.list encodeFly model.flies)
     ]
 
 view : Model -> Html Msg

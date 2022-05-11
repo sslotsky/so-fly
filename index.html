@@ -32,6 +32,11 @@
 				context.fill()
 
 				context.fillText('🐸', gameData.hero.x - 4, gameData.hero.y + 4)
+
+				for (let i = 0; i < gameData.flies.length; i++) {
+					const fly = gameData.flies[i]
+					context.fillText('🪰', fly.x - 4, fly.y + 4)
+				}
 			}
 		}
 
