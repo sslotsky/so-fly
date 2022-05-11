@@ -33,7 +33,7 @@
 
 				const frogSize = Math.floor(gameData.hero.size * 12)
 				context.font = context.font.replace(/\d+px/, `${frogSize}px`)
-				context.fillText('🐸', gameData.hero.x - 4, gameData.hero.y + 4)
+				context.fillText('🐸', gameData.hero.x - (frogSize / 2), gameData.hero.y + (frogSize / 2))
 
 				context.font = context.font.replace(/\d+px/, "12px")
 				for (let i = 0; i < gameData.flies.length; i++) {
