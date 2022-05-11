@@ -241,7 +241,7 @@ update msg model =
         40 -> (model |> stopMoving Down, Cmd.none)
         _ -> (model, Cmd.none)
     Turn {index, angle, odds} ->
-      if odds > 0.4 then
+      if odds > 0.2 then
         (model, Cmd.none)
       else
         let
