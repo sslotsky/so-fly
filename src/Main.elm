@@ -44,7 +44,7 @@ type alias MoveController =
 type alias Fly =
   { position: Position, velocity: Velocity }
 type alias Hero =
-  { position: Position, velocity: Velocity }
+  { position: Position, velocity: Velocity, size: Float }
 
 type alias Model =
   { height: Int
@@ -59,7 +59,7 @@ init _ =
   let ((height, width), position, velocity) = ((400, 600), (5, 50), (0, 0)) in
   let controller = { right = False, up = False, down = False, left = False } in
 
-  let hero = { position = position, velocity = velocity } in
+  let hero = { position = position, velocity = velocity, size = 1 } in
   let model = Model height width hero [] controller
   in
     (model, Cmd.none)
@@ -168,12 +168,19 @@ captureNearbyFlies model =
       let
         (x, y) = position
         (heroX, heroY) = model.hero.position
+        range = model.hero.size * 20
+        gapX = abs (x - heroX)
+        gapY = abs (y - heroY)
+        distance = sqrt (gapX * gapX) + (gapY * gapY)
       in
-        (abs (x - heroX) <= 5) || (abs (y - heroY) <= 5)
+        distance <= range
     
     (captured, uncaptured) = model.flies |> List.partition isWithinRange
+    {hero} = model
+    biggerHero = { hero | size = hero.size + (0.2 * toFloat (List.length captured))}
+    
   in
-    { model | flies = uncaptured }
+    { model | flies = uncaptured, hero = biggerHero }
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -187,7 +194,7 @@ update msg model =
           ]
         )
     NewFly {position, odds} ->
-      if odds > 0.001 then
+      if odds > 0.005 then
         (model, Cmd.none)
       else
         let
@@ -214,13 +221,14 @@ update msg model =
 -- VIEW
 
 encodeHero : Hero -> E.Value
-encodeHero {position} = 
+encodeHero {position, size} = 
   let
     (x, y) = position
   in
     E.object
       [ ("x", E.float x)
       , ("y", E.float y)
+      , ("size", E.float size)
       ]
 
 encodeFly : Fly -> E.Value

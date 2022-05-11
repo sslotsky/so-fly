@@ -31,8 +31,11 @@
 				context.fillStyle = "black"
 				context.fill()
 
+				const frogSize = Math.floor(gameData.hero.size * 12)
+				context.font = context.font.replace(/\d+px/, `${frogSize}px`)
 				context.fillText('🐸', gameData.hero.x - 4, gameData.hero.y + 4)
 
+				context.font = context.font.replace(/\d+px/, "12px")
 				for (let i = 0; i < gameData.flies.length; i++) {
 					const fly = gameData.flies[i]
 					context.fillText('🪰', fly.x - 4, fly.y + 4)
