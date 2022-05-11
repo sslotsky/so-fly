@@ -6,6 +6,7 @@ import Random
 import Html exposing (Html, node)
 import Html.Attributes exposing (height)
 import Html.Attributes exposing (width)
+import Array exposing (get, fromList, toList, set)
 
 
 
@@ -73,11 +74,17 @@ type alias FlySpawn =
   , odds: Float
   }
 
+type alias TurnMessage =
+  { index: Int
+  , angle: Int
+  , odds: Float
+  }
 type Msg
   = Tick Time.Posix
   | NewFly FlySpawn
   | BodyKeyPress Int
   | BodyKeyUp Int
+  | Turn TurnMessage
 
 move: Hero -> Float -> Float -> Hero
 move hero x y =
@@ -141,7 +148,7 @@ nextState model =
     (nextX, nextY) = clamped (toFloat model.width) (toFloat model.height) (x + vx, y + vy)
     newSize = max (hero.size * 0.9999) 1
   in
-    { model | hero = move { hero | size = newSize } nextX nextY |> withFriction }
+    { model | flies = moveFlies model.flies, hero = move { hero | size = newSize } nextX nextY |> withFriction }
 
 moveToggle : Bool -> Direction -> Model -> Model
 moveToggle on direction model =
@@ -162,6 +169,20 @@ randomPoint model =
 randomFly model =
   Random.map2 FlySpawn (randomPoint model) (Random.float 0 1)
 
+turnFly flies = 
+  Random.map3 TurnMessage (Random.int 0 ((List.length flies) - 1)) (Random.int 0 360) (Random.float 0 1)
+
+moveFlies : List(Fly) -> List(Fly)
+moveFlies flies =
+  flies |> List.map
+    (
+      \fly ->
+        let
+          (x, y) = fly.position
+          (vx, vy) = fly.velocity
+        in
+          { fly | position = (x + vx, y + vy)}
+    )
 captureNearbyFlies model =
   let
     isWithinRange : Fly -> Bool
@@ -192,6 +213,7 @@ update msg model =
         , Cmd.batch
           [ sendMessage (encodeGame next)
           , Random.generate NewFly (randomFly model)
+          , Random.generate Turn (turnFly model.flies) 
           ]
         )
     NewFly {position, odds} ->
@@ -218,6 +240,30 @@ update msg model =
         39 -> (model |> stopMoving Right, Cmd.none)
         40 -> (model |> stopMoving Down, Cmd.none)
         _ -> (model, Cmd.none)
+    Turn {index, angle, odds} ->
+      if odds > 0.4 then
+        (model, Cmd.none)
+      else
+        let
+          fly = get index (fromList model.flies)
+        in
+          case fly of
+            Nothing -> (model, Cmd.none)
+            Just f ->
+              let
+                slope = tan (degrees (toFloat angle))
+                b = 1 / (5 * sqrt(1 + (slope * slope)))
+                a = 1 / (5 * sqrt(1 + (1 / (slope * slope))))
+                (vx, vy) = case (angle < 180, angle >= 90 && angle < 270) of
+                  (True, True) -> (b, -a)
+                  (True, False) -> (b, a)
+                  (False, True) -> (-b, -a)
+                  (False, False) -> (-b, a)
+                adjustedFly = { f | velocity = (vx, vy) }
+                flies = toList (set index adjustedFly (fromList model.flies))
+              in
+                ({ model | flies = flies }, Cmd.none)
+        
 
 -- VIEW
 
@@ -254,3 +300,5 @@ encodeGame model =
 view : Model -> Html Msg
 view model =
   node "game-canvas" [height model.height, width model.width] []
+
+-- b = +/- (1 / sqrt(25 + m * m))
