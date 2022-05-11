@@ -139,8 +139,9 @@ nextState model =
     {position, velocity} = hero
     ((x, y), (vx, vy)) = (position, velocity)
     (nextX, nextY) = clamped (toFloat model.width) (toFloat model.height) (x + vx, y + vy)
+    newSize = max (hero.size * 0.9999) 1
   in
-    { model | hero = move hero nextX nextY |> withFriction }
+    { model | hero = move { hero | size = newSize } nextX nextY |> withFriction }
 
 moveToggle : Bool -> Direction -> Model -> Model
 moveToggle on direction model =
