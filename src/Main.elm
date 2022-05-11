@@ -68,9 +68,14 @@ init _ =
 -- UPDATE
 
 
+type alias FlySpawn =
+  { position: Position
+  , odds: Float
+  }
+
 type Msg
   = Tick Time.Posix
-  | NewFly Position
+  | NewFly FlySpawn
   | BodyKeyPress Int
   | BodyKeyUp Int
 
@@ -153,6 +158,9 @@ randomPoint : Model -> Random.Generator Position
 randomPoint model =
   Random.pair (Random.float 0 (toFloat model.width)) (Random.float 0 (toFloat model.height))
 
+randomFly model =
+  Random.map2 FlySpawn (randomPoint model) (Random.float 0 1)
+
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
@@ -161,15 +169,18 @@ update msg model =
         ( next
         , Cmd.batch
           [ sendMessage (encodeGame next)
-          , Random.generate NewFly (randomPoint model)
+          , Random.generate NewFly (randomFly model)
           ]
         )
-    NewFly position ->
-      let
-        fly = { position = position, velocity = (0, 0) }
-        flies = fly :: model.flies
-      in
-        ({ model | flies = flies }, Cmd.none)
+    NewFly {position, odds} ->
+      if odds > 0.001 then
+        (model, Cmd.none)
+      else
+        let
+          fly = { position = position, velocity = (0, 0) }
+          flies = fly :: model.flies
+        in
+          ({ model | flies = flies }, Cmd.none)
     BodyKeyPress keyCode ->
       case keyCode of
         37 -> (model |> startMoving Left, Cmd.none)
