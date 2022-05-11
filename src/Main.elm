@@ -161,6 +161,20 @@ randomPoint model =
 randomFly model =
   Random.map2 FlySpawn (randomPoint model) (Random.float 0 1)
 
+captureNearbyFlies model =
+  let
+    isWithinRange : Fly -> Bool
+    isWithinRange {position} =
+      let
+        (x, y) = position
+        (heroX, heroY) = model.hero.position
+      in
+        (abs (x - heroX) <= 5) || (abs (y - heroY) <= 5)
+    
+    (captured, uncaptured) = model.flies |> List.partition isWithinRange
+  in
+    { model | flies = uncaptured }
+
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
@@ -187,6 +201,7 @@ update msg model =
         38 -> (model |> startMoving Up, Cmd.none)
         39 -> (model |> startMoving Right, Cmd.none)
         40 -> (model |> startMoving Down, Cmd.none)
+        32 -> (model |> captureNearbyFlies, Cmd.none)
         _ -> (model, Cmd.none)
     BodyKeyUp keyCode ->
       case keyCode of
