@@ -1,0 +1,63 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Elm St</title>
+	<script type="module">
+		class GameCanvas extends HTMLElement {
+			constructor() {
+				super()
+
+				const shadow = this.attachShadow({ mode: 'open' })
+				const canvas = document.createElement('canvas')
+				shadow.appendChild(canvas)
+				canvas.height = this.height()
+				canvas.width = this.width()
+				this.canvas = canvas
+			}
+
+			height() {
+				return this.getAttribute('height')
+			}
+
+			width() {
+				return this.getAttribute('width')
+			}
+
+			draw(gameData) {
+				const context = this.canvas.getContext('2d')
+				context.clearRect(0, 0, this.width, this.height)
+				context.beginPath()
+				context.rect(0, 0, this.width(), this.height())
+				context.fillStyle = "black"
+				context.fill()
+
+				const frogSize = Math.floor(gameData.hero.size * 12)
+				context.font = context.font.replace(/\d+px/, `${frogSize}px`)
+				context.fillText('🐸', gameData.hero.x - (frogSize / 2), gameData.hero.y + (frogSize / 2))
+
+				context.font = context.font.replace(/\d+px/, "12px")
+				for (let i = 0; i < gameData.flies.length; i++) {
+					const fly = gameData.flies[i]
+					context.fillText('🪰', fly.x - 4, fly.y + 4)
+				}
+			}
+		}
+
+		customElements.define('game-canvas', GameCanvas)
+	</script>
+</head>
+
+<template id="game-template">
+	<canvas></canvas>
+</template>
+
+<body>
+	<div>
+		<p>Move the frog around with the arrow keys &larr; &uarr; &rarr; &darr;</p>
+		<p>When you get close to a fly, try to capture it by pressing the spacebard</p>
+		<p>The frog will grow as it catches flies, but will shrink back down when it starts to get hungry!</p>
+		<div id="app"></div>
+	</div>
+</body>
+<script src="index.js"></script>
+</html>
