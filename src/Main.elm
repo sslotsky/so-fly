@@ -149,7 +149,11 @@ nextState model =
     (nextX, nextY) = clamped (toFloat model.width) (toFloat model.height) (x + vx, y + vy)
     newSize = max (hero.size * 0.9999) 1
   in
-    { model | flies = moveFlies model.flies, hero = move { hero | size = newSize } nextX nextY |> withFriction }
+    {
+      model | 
+        flies = moveFlies model, 
+        hero = move { hero | size = newSize } nextX nextY |> withFriction 
+    }
 
 moveToggle : Bool -> Direction -> Model -> Model
 moveToggle on direction model =
@@ -173,17 +177,20 @@ randomFly model =
 turnFly flies = 
   Random.map3 TurnMessage (Random.int 0 ((List.length flies) - 1)) (Random.int 0 360) (Random.float 0 1)
 
-moveFlies : List(Fly) -> List(Fly)
-moveFlies flies =
-  flies |> List.map
-    (
-      \fly ->
-        let
-          (x, y) = fly.position
-          (vx, vy) = fly.velocity
-        in
-          { fly | position = (x + vx, y + vy)}
-    )
+moveFlies : Model -> List(Fly)
+moveFlies {flies, height, width} =
+  let
+    moveFly : Fly -> Fly
+    moveFly fly =
+      let
+        (x, y) = fly.position
+        (vx, vy) = fly.velocity
+        nextX = clamp 0 (toFloat width) (x + vx)
+        nextY = clamp 0 (toFloat height) (y + vy)
+      in
+        { fly | position = (nextX, nextY)}
+  in
+    flies |> List.map moveFly
 
 captureNearbyFlies : Model -> Model
 captureNearbyFlies model =
