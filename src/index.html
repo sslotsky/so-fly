@@ -25,12 +25,14 @@
 
 			draw(gameData) {
 				const context = this.canvas.getContext('2d')
-				context.clearRect(0, 0, this.width, this.height)
+				context.clearRect(0, 0, this.width(), this.height())
 				context.beginPath()
 				context.rect(0, 0, this.width(), this.height())
 				context.fillStyle = "black"
 				context.fill()
 
+				context.fillStyle = "white"
+				context.fillText(`Score: ${gameData.score} Size: ${gameData.hero.size.toFixed(2)}`, 5, this.height() - 5)
 				const frogSize = Math.floor(gameData.hero.size * 12)
 				context.font = context.font.replace(/\d+px/, `${frogSize}px`)
 				context.fillText('🐸', gameData.hero.x - (frogSize / 2), gameData.hero.y + (frogSize / 2))

@@ -50,6 +50,7 @@ type alias Hero =
 type alias Model =
   { height: Int
   , width: Int
+  , score: Int
   , hero: Hero
   , flies: List(Fly)
   , controller: MoveController
@@ -61,7 +62,7 @@ init _ =
   let controller = { right = False, up = False, down = False, left = False } in
 
   let hero = { position = position, velocity = velocity, size = 1 } in
-  let model = Model height width hero [] controller
+  let model = Model height width 0 hero [] controller
   in
     (model, Cmd.none)
 
@@ -183,6 +184,8 @@ moveFlies flies =
         in
           { fly | position = (x + vx, y + vy)}
     )
+
+captureNearbyFlies : Model -> Model
 captureNearbyFlies model =
   let
     isWithinRange : Fly -> Bool
@@ -202,7 +205,11 @@ captureNearbyFlies model =
     biggerHero = { hero | size = hero.size + (0.2 * toFloat (List.length captured))}
     
   in
-    { model | flies = uncaptured, hero = biggerHero }
+    {
+      model |
+        score = model.score + (List.length captured)
+      , flies = uncaptured, hero = biggerHero
+    }
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -293,6 +300,7 @@ encodeGame model =
   E.object
     [ ("height", E.int model.height)
     , ("width", E.int model.width)
+    , ("score", E.int model.score)
     , ("hero", encodeHero model.hero)
     , ("flies", E.list encodeFly model.flies)
     ]
@@ -300,5 +308,3 @@ encodeGame model =
 view : Model -> Html Msg
 view model =
   node "game-canvas" [height model.height, width model.width] []
-
--- b = +/- (1 / sqrt(25 + m * m))
