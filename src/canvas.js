@@ -178,9 +178,14 @@ const drawFrog = (ctx, hero, heading, t) => {
   ctx.restore()
 }
 
+const mouth = (hero, heading) => ({
+  x: hero.x + Math.cos(heading) * hero.size * 9,
+  y: hero.y + Math.sin(heading) * hero.size * 9
+})
+
 const drawTongue = (ctx, from, lick, t) => {
   const age = (t - lick.born) / lick.life
-  const reach = age < 0.5 ? age * 2 : (1 - age) * 2
+  const reach = Math.sin(Math.min(1, age) * Math.PI)
   const x = from.x + (lick.x - from.x) * reach
   const y = from.y + (lick.y - from.y) * reach
   ctx.strokeStyle = '#e8688a'
@@ -289,6 +294,21 @@ class GameCanvas extends HTMLElement {
     this.licks = this.licks.filter(l => t - l.born < l.life)
   }
 
+  flick() {
+    const hero = this.previous && this.previous.hero
+    if (!hero) return
+    this.licks.push({ reach: hero.size * 20, born: performance.now(), life: 220 })
+  }
+
+  tongueTip(hero, lick) {
+    if (lick.reach === undefined) return lick
+    return {
+      ...lick,
+      x: hero.x + Math.cos(this.heading) * lick.reach,
+      y: hero.y + Math.sin(this.heading) * lick.reach
+    }
+  }
+
   draw(gameData) {
     const t = performance.now()
     this.track(gameData, t)
@@ -301,8 +321,8 @@ class GameCanvas extends HTMLElement {
     drawWater(ctx, width, height, t)
     this.ripples.forEach(r => drawRipple(ctx, r, t))
     this.pads.forEach(p => drawPad(ctx, p, t))
-    this.licks.forEach(l => drawTongue(ctx, gameData.hero, l, t))
     drawFrog(ctx, gameData.hero, this.heading, t)
+    this.licks.forEach(l => drawTongue(ctx, mouth(gameData.hero, this.heading), this.tongueTip(gameData.hero, l), t))
     gameData.flies.forEach((fly, i) => drawFly(ctx, fly, t, i))
     drawHud(ctx, gameData, width)
   }

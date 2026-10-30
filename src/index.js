@@ -10,6 +10,7 @@ customElements.whenDefined('game-canvas').then(() => {
   })
 
   document.body.onkeydown = function(e) {
+    if (e.keyCode === 32 && !e.repeat) document.getElementsByTagName('game-canvas')[0].flick();
     app.ports.bodyKeyPress.send(e.keyCode);
   };
 
