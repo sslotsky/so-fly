@@ -1,65 +1,86 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>So Fly</title>
-	<script type="module">
-		class GameCanvas extends HTMLElement {
-			constructor() {
-				super()
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: ui-rounded, "SF Pro Rounded", system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
 
-				const shadow = this.attachShadow({ mode: 'open' })
-				const canvas = document.createElement('canvas')
-				shadow.appendChild(canvas)
-				canvas.height = this.height()
-				canvas.width = this.width()
-				this.canvas = canvas
-			}
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(circle at 20% 10%, rgba(120, 190, 120, 0.18), transparent 45%),
+        radial-gradient(circle at 85% 90%, rgba(60, 140, 150, 0.22), transparent 50%),
+        #0a1d1f;
+      color: #e3f0e6;
+    }
 
-			height() {
-				return this.getAttribute('height')
-			}
+    main {
+      width: min(640px, calc(100vw - 32px));
+      padding: 32px 0;
+    }
 
-			width() {
-				return this.getAttribute('width')
-			}
+    h1 {
+      margin: 0;
+      font-size: 2.6rem;
+      letter-spacing: 0.01em;
+      color: #a6e07f;
+    }
 
-			draw(gameData) {
-				const context = this.canvas.getContext('2d')
-				context.clearRect(0, 0, this.width(), this.height())
-				context.beginPath()
-				context.rect(0, 0, this.width(), this.height())
-				context.fillStyle = "black"
-				context.fill()
+    .tagline {
+      margin: 4px 0 20px;
+      color: rgba(227, 240, 230, 0.7);
+    }
 
-				context.fillStyle = "white"
-				context.fillText(`Score: ${gameData.score} Size: ${gameData.hero.size.toFixed(2)}`, 5, this.height() - 5)
-				const frogSize = Math.floor(gameData.hero.size * 12)
-				context.font = context.font.replace(/\d+px/, `${frogSize}px`)
-				context.fillText('🐸', gameData.hero.x - (frogSize / 2), gameData.hero.y + (frogSize / 2))
+    #app, game-canvas {
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(166, 224, 127, 0.18);
+      border-radius: 18px;
+    }
 
-				context.font = context.font.replace(/\d+px/, "12px")
-				for (let i = 0; i < gameData.flies.length; i++) {
-					const fly = gameData.flies[i]
-					context.fillText('🪰', fly.x - 4, fly.y + 4)
-				}
-			}
-		}
+    ul {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 20px;
+      margin: 18px 0 0;
+      padding: 0;
+      font-size: 0.95rem;
+      color: rgba(227, 240, 230, 0.8);
+    }
 
-		customElements.define('game-canvas', GameCanvas)
-	</script>
+    kbd {
+      display: inline-block;
+      min-width: 1.4em;
+      padding: 1px 6px;
+      margin-right: 2px;
+      border-radius: 6px;
+      background: rgba(227, 240, 230, 0.1);
+      border: 1px solid rgba(227, 240, 230, 0.25);
+      border-bottom-width: 2px;
+      font: inherit;
+      font-size: 0.85em;
+      text-align: center;
+    }
+  </style>
 </head>
 
-<template id="game-template">
-	<canvas></canvas>
-</template>
-
 <body>
-	<div>
-		<p>Move the frog around with the arrow keys &larr; &uarr; &rarr; &darr;</p>
-		<p>When you get close to a fly, try to capture it by pressing the spacebar</p>
-		<p>The frog will grow as it catches flies, but will shrink back down when it starts to get hungry!</p>
-		<div id="app"></div>
-	</div>
+  <main>
+    <h1>So Fly</h1>
+    <p class="tagline">Help the frog catch its dinner. Keep feeding it, or it shrinks back down.</p>
+    <div id="app"></div>
+    <ul>
+      <li><kbd>&larr;</kbd><kbd>&uarr;</kbd><kbd>&rarr;</kbd><kbd>&darr;</kbd> swim</li>
+      <li><kbd>Space</kbd> snap up a nearby fly</li>
+    </ul>
+  </main>
+  <script src="index.js"></script>
 </body>
-<script src="index.js"></script>
 </html>
