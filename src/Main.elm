@@ -107,19 +107,21 @@ push : Hero -> Direction -> Model -> Hero
 push hero direction {height, width} =
   let (x, y) = hero.velocity in
   let acc = 0.02 in
+  let topSpeed = 1.2 in
+  let capped speed = clamp -topSpeed topSpeed speed in
   let (px, py) = hero.position in
     case direction of
       Left -> 
-        let speed = if px > 0 then x - acc else 0 in
+        let speed = if px > 0 then capped (x - acc) else 0 in
           { hero | velocity = (speed, y)}
       Right ->
-        let speed = if px < toFloat width then x + acc else 0 in
+        let speed = if px < toFloat width then capped (x + acc) else 0 in
           { hero | velocity = (speed, y)}
       Up ->
-        let speed = if py > 0 then y - acc else 0 in
+        let speed = if py > 0 then capped (y - acc) else 0 in
           { hero | velocity = (x, speed)}
       Down ->
-        let speed = if py < toFloat height then y + acc else 0 in
+        let speed = if py < toFloat height then capped (y + acc) else 0 in
         { hero | velocity = (x, speed)}
 
 adjustVelocity : Model -> Hero
@@ -203,7 +205,7 @@ captureNearbyFlies model =
         range = model.hero.size * 20
         gapX = abs (x - heroX)
         gapY = abs (y - heroY)
-        distance = sqrt (gapX * gapX) + (gapY * gapY)
+        distance = sqrt ((gapX * gapX) + (gapY * gapY))
       in
         distance <= range
     
